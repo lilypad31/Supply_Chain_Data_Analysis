@@ -18,6 +18,26 @@ WHERE table_name = 'orders'
 ORDER BY ordinal_position;
 ```
 
+## Reusable script: run a SQL query and print as Markdown table
+Paste this into a .py file (or Terminal via python3) to quickly turn any query
+result into a copy-pasteable Markdown table for these notes.
+
+```python
+import pandas as pd
+from sqlalchemy import create_engine
+import getpass
+
+password = getpass.getpass("Enter your Postgres password: ")
+engine = create_engine(f"postgresql://postgres:{password}@localhost:5432/supply_chain_db")
+
+query = '''
+-- paste your SQL query here
+'''
+
+df = pd.read_sql(query, engine)
+print(df.to_markdown(index=False))
+```
+
 ## Findings so far
 
 ### Late delivery rate by Shipping Mode
@@ -32,3 +52,13 @@ ORDER BY ordinal_position;
 While initially appears counterintuitive, this is not likely due to literal speed, but rather First Class likely promises a tight delivery window, making it easy to miss; Standard Class probably promises a loose window, making it easy to hit.
 
 **Next step to confirm:** compare "Days for shipping (real)" vs "Days for shipment (scheduled)" by Shipping Mode  to confirm tight-promise theory regarding First Class shipping.
+
+### Real vs scheduled delivery days by Shipping Mode
+| Shipping Mode   |   avg_scheduled_days |   avg_real_days |   avg_days_over |
+|:----------------|---------------------:|----------------:|----------------:|
+| Second Class    |                    2 |        3.99083  |            1.99 |
+| First Class     |                    1 |        2        |            1    |
+| Same Day        |                    0 |        0.478279 |            0.48 |
+| Standard Class  |                    4 |        3.99591  |            0    |
+
+**Key insight:** Actual delivery times are fairly similar across all shipping modes (roughly 2-4 days regardless of tier). Fulfillment doesn't get meaningfully faster just because a customer paid for a faster tier. Promised/scheduled shipping days do not reflect actual shipping times; this confirms the previous finding that late shipping reflects broken promises vs fulfillment capability, not actual speed differences between different tiers.
