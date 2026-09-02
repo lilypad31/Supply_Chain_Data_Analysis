@@ -71,6 +71,10 @@ While initially appears counterintuitive, this is not likely due to literal spee
 |                    0 | Shipping on time  |         32196 |
 |                    1 | Late delivery     |         98977 |
 
-**Conclusion:** 'Late_delivery_risk' is not a separate signal; it's just a pre-computed 0/1 that communicates whether or not "Delivery Status = Late delivery" (N being 0, Y being 1). Not useful as an independent feature, but confirms that AVG("Late_delivery_risk")rather than a full CASE WHEN calculation is a reliable shortcut.
+**Conclusion:** 'Late_delivery_risk' is not a separate signal; it's just a pre-computed 0/1 that communicates whether or not "Delivery Status = Late delivery" (N being 0, Y being 1). Not useful as an independent feature, but confirms that AVG("Late_delivery_risk") rather than a full CASE WHEN calculation is a reliable shortcut.
 
 **README Headline number:** 98,977 of 180,519 total orders are late - about 54.8% overall.
+
+**Resolved open question:** For "Shipping on time", does that include or exclude "Advance shipping"?
+No, the Delivery Status cross-check shows 4 distinct, mutually exclusive values (Advance shipping, Shipping canceled, Shipping on time, Late delivery), each with its own separate count. They are separate categories, not overlapping.
+Notably, Advance shipping has a higher order count than Shipping on time.
